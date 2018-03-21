@@ -102,7 +102,7 @@ def main():
     multi_proc_count = cpu_count()
     if multi_proc_count > 0:
         log_info("Building in multiprocessing mode on ", multi_proc_count, " cores.")
-        os.system('make -j' + str(multi_proc_count))
+        os.system('make -j' + str(multi_proc_count) + " ENABLE_PROFILING=1")
     else:
         log_info("Building in single core mode.")
         os.system('make')

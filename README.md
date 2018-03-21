@@ -26,6 +26,11 @@ First, make sure that you have cmake (used by setup/build scripts) and libxml (r
 sudo apt-get install cmake libxml2-dev
 ```
 
+To run Dr. Checker's Soundy Analysis with profiling enabled (-ap flag), you must install the following package:
+```
+sudo apt-get install google-perftools
+```
+
 Next, We have created a single script, which downloads and builds all the required tools.
 ```
 cd helper_scripts

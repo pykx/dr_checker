@@ -34,21 +34,23 @@ set_target_properties(SoundyAliasAnalysisStatic
 # LLVM is (typically) built with no C++ RTTI. We need to match that;
 # otherwise, we'll get linker errors about missing RTTI data.
 set_target_properties(SoundyAliasAnalysis PROPERTIES
-    COMPILE_FLAGS "-g -fno-rtti"
+    COMPILE_FLAGS "-pg -g -fno-rtti"
+    LINK_FLAGS "-pg"
 )
 
 set_target_properties(SoundyAliasAnalysisStatic PROPERTIES
-        COMPILE_FLAGS "-g -fno-rtti"
+        COMPILE_FLAGS "-pg -g -fno-rtti"
+        LINK_FLAGS "-pg"
         )
 
 # Get proper shared-library behavior (where symbols are not necessarily
 # resolved when the shared library is linked) on OS X.
 if(APPLE)
     set_target_properties(SoundyAliasAnalysis PROPERTIES
-        LINK_FLAGS "-undefined dynamic_lookup"
+        LINK_FLAGS "-pg -undefined dynamic_lookup"
     )
     set_target_properties(SoundyAliasAnalysisStatic PROPERTIES
-            LINK_FLAGS "-undefined dynamic_lookup"
+            LINK_FLAGS "-pg -undefined dynamic_lookup"
             )
 endif(APPLE)
 

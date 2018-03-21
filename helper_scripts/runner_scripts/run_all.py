@@ -49,6 +49,9 @@ def setup_args():
     parser.add_argument('-f', action='store', dest='soundy_analysis_out',
                         help='Path to the output folder where the soundy analysis output should be stored.')
 
+    parser.add_argument('-ap', action='store_true', dest='run_soundy_with_profiling_enabled', default=False,
+                        help='Run Soundy Analysis with performance profiling enabled (default: no performance profiling).')
+
     return parser
 
 
@@ -91,6 +94,8 @@ def main():
     arg_dict['soundy_analysis_out'] = parsed_args.soundy_analysis_out
     arg_dict['soundy_analysis_instr_out'] = os.path.join(parsed_args.soundy_analysis_out, "instr_warnings")
     arg_dict['total_warning_stats'] = os.path.join(parsed_args.soundy_analysis_out, 'warnings_stats.csv')
+    if parsed_args.run_soundy_with_profiling_enabled:
+        arg_dict['soundy_analysis_profiling_enabled'] = True
     __add_temp_files(arg_dict)
 
     component_times = {}
