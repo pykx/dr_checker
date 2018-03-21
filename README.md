@@ -99,6 +99,7 @@ optional arguments:
                         skipped).
   -ski                  Skip Soundy Analysis (default: not skipped).
   -f SOUNDY_ANALYSIS_OUT    Path to the output folder where the soundy analysis output should be stored.
+  -ap                   Run Soundy Analysis with performance profiling enabled (default: no performance profiling).
 
 ```
 The script builds, links and runs DR.CHECKER on all the drivers, as such might take **considerable time(45 min-90 min)**. If you want to run DR.CHECKER manually on individual drivers, refer [standalone](https://github.com/ucsb-seclab/dr_checker/tree/master/docs/standalone.md)
