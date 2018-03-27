@@ -102,6 +102,7 @@ namespace DRCHECKER {
 
         void printAliasAnalysisResults(llvm::raw_ostream& O) const;
 
+        std::tuple<int, int, double> printAliasAnalysisSummary(llvm::raw_ostream& O) const;
 
     private:
         // maximum number of times a basic block can be analyzed.

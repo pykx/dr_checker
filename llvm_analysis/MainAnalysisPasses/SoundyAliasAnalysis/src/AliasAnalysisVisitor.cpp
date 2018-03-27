@@ -2,6 +2,7 @@
 // Created by machiry on 12/4/16.
 //
 #include <llvm/IR/Operator.h>
+#include <tuple>
 #include "AliasObject.h"
 #include "AliasAnalysisVisitor.h"
 
@@ -951,5 +952,30 @@ namespace DRCHECKER {
                 O << "\n";
             }
         }
+    }
+
+    std::tuple<int, int, double> AliasAnalysisVisitor::printAliasAnalysisSummary(llvm::raw_ostream& O) const {
+        /***
+         * Print summary of alias analysis results into provided stream.
+         */
+        unsigned totalSrcPtrs = 0;
+        unsigned totalDstPtrs = 0;
+        double averagePointsToCount = 0;
+
+        std::map<Value *, std::set<PointerPointsTo*>*>* targetPointsToMap = this->currState.getPointsToInfo(this->currFuncCallSites);
+        for(auto ai:*targetPointsToMap) {
+            totalSrcPtrs++;
+            for(auto pp:*(ai.second)) {
+                totalDstPtrs++;
+            }
+        }
+        averagePointsToCount = ((double)totalDstPtrs / (double)totalSrcPtrs);
+
+        O << "[AliasAnalysis Summary]: srcs: " << totalSrcPtrs 
+        << ", dsts: " << totalDstPtrs 
+        << ", average points-to count: " << averagePointsToCount << "\n";
+
+        return std::make_tuple(totalSrcPtrs, totalDstPtrs, averagePointsToCount);
+
     }
 }

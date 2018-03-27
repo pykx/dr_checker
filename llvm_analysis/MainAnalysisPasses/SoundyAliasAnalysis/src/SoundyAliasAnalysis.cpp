@@ -53,6 +53,9 @@ namespace DRCHECKER {
     FunctionHandler* AliasAnalysisVisitor::functionHandler = new FunctionHandler(new KernelFunctionChecker());
     FunctionChecker* TaintAnalysisVisitor::functionChecker = nullptr;
 
+    // For logging
+    AliasAnalysisVisitor *aliasAnalysisCallback = nullptr;
+
     static cl::opt<std::string> checkFunctionName("toCheckFunction",
                                               cl::desc("Function which is to be considered as entry point "
                                                                "into the driver"),
@@ -280,6 +283,10 @@ namespace DRCHECKER {
                             dbgs() << "[+] Return message from file write:" << res_code.message() << "\n";
                         }
 
+                        if (aliasAnalysisCallback != nullptr) {
+                            aliasAnalysisCallback->printAliasAnalysisSummary(dbgs());
+                        }
+
                         //clean up
                         delete(vis);
 
@@ -303,6 +310,7 @@ namespace DRCHECKER {
             // run.
 
             VisitorCallback *currVisCallback = new AliasAnalysisVisitor(targetState, toAnalyze, srcCallSites);
+            aliasAnalysisCallback = (AliasAnalysisVisitor *)currVisCallback;
 
             // first add AliasAnalysis, this is the main analysis needed by everyone.
             allCallbacks->insert(allCallbacks->end(), currVisCallback);
