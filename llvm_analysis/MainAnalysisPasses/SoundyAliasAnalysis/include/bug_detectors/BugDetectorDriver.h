@@ -71,6 +71,9 @@ namespace DRCHECKER {
          * @param O output stream to which the warnings should be written to
          */
         static void printWarningsByInstr(GlobalState &targetState, llvm::raw_ostream& O);
+
+        // TODO: Add doc comment here
+        static void printPointsToSummary(GlobalState &targetState, llvm::raw_ostream& O);
     };
 }
 

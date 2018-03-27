@@ -53,9 +53,6 @@ namespace DRCHECKER {
     FunctionHandler* AliasAnalysisVisitor::functionHandler = new FunctionHandler(new KernelFunctionChecker());
     FunctionChecker* TaintAnalysisVisitor::functionChecker = nullptr;
 
-    // For logging
-    AliasAnalysisVisitor *aliasAnalysisCallback = nullptr;
-
     static cl::opt<std::string> checkFunctionName("toCheckFunction",
                                               cl::desc("Function which is to be considered as entry point "
                                                                "into the driver"),
@@ -78,6 +75,9 @@ namespace DRCHECKER {
                                               cl::desc("Path to the output file, where all the warnings w.r.t instructions should be stored."),
                                               cl::value_desc("Path of the output file."), cl::init(""));
 
+    static cl::opt<std::string> statsFile("statsOutput",
+                                              cl::desc("Path to the output file, where runtime statistics should be stored."),
+                                              cl::value_desc("Path of the output file."), cl::init(""));
 
     struct SAAPass: public ModulePass {
     public:
@@ -256,6 +256,7 @@ namespace DRCHECKER {
                             dbgs() << "[+] JSON START:\n\n";
                             BugDetectorDriver::printAllWarnings(currState, dbgs());
                             BugDetectorDriver::printWarningsByInstr(currState, dbgs());
+                            //TODO: Add stats print here
                             dbgs() << "\n\n[+] JSON END\n";
                         } else {
                             std::error_code res_code;
@@ -281,10 +282,23 @@ namespace DRCHECKER {
                             instr_op_stream.close();
 
                             dbgs() << "[+] Return message from file write:" << res_code.message() << "\n";
-                        }
 
-                        if (aliasAnalysisCallback != nullptr) {
-                            aliasAnalysisCallback->printAliasAnalysisSummary(dbgs());
+                            std::string statsFile;
+                            originalFile = statsFile;
+                            if(!originalFile.empty()) {
+                                statsFile = originalFile;
+                            } else {
+                                statsFile = outputFile;
+                                statsFile.append(".stats.json");
+                            }
+
+                            dbgs() << "[+] Writing Instr output to:" << statsFile << "\n";
+                            llvm::raw_fd_ostream stats_op_stream(statsFile, res_code, llvm::sys::fs::F_Text);
+                            BugDetectorDriver::printPointsToSummary(currState, stats_op_stream);
+                            stats_op_stream.close();
+
+                            dbgs() << "[+] Return message from file write:" << res_code.message() << "\n";
+
                         }
 
                         //clean up
@@ -310,7 +324,6 @@ namespace DRCHECKER {
             // run.
 
             VisitorCallback *currVisCallback = new AliasAnalysisVisitor(targetState, toAnalyze, srcCallSites);
-            aliasAnalysisCallback = (AliasAnalysisVisitor *)currVisCallback;
 
             // first add AliasAnalysis, this is the main analysis needed by everyone.
             allCallbacks->insert(allCallbacks->end(), currVisCallback);

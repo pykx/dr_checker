@@ -200,4 +200,28 @@ namespace DRCHECKER {
         }
         O << "\n}";
     }
+
+    void BugDetectorDriver::printPointsToSummary(GlobalState &targetState, llvm::raw_ostream& O) {
+
+        /***
+         * Print summary of alias analysis results into provided stream.
+         */
+        unsigned totalSrcPtrs = 0;
+        unsigned totalDstPtrs = 0;
+
+        for(auto ptInfo = targetState.pointToInformation.begin(); ptInfo != targetState.pointToInformation.end(); ptInfo++) {
+            for(auto pointsTo_iter = ptInfo->second->begin(); pointsTo_iter != ptInfo->second->end(); pointsTo_iter++) {
+                auto targetPointsTo = pointsTo_iter->second;
+                totalSrcPtrs++;
+                for(auto currPointsTo: *targetPointsTo) {
+                    totalDstPtrs++;
+                }
+            }
+        }
+
+        O << "{\"points_to_summary\":["
+        << "{\"src_ptrs\":" << totalSrcPtrs << "}, "
+        << "{\"dst_ptrs\":" << totalDstPtrs << "}]}\n";
+
+    }
 }
