@@ -2,7 +2,6 @@
 // Created by machiry on 12/4/16.
 //
 #include <llvm/IR/Operator.h>
-#include <tuple>
 #include "AliasObject.h"
 #include "AliasAnalysisVisitor.h"
 

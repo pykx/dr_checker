@@ -13,6 +13,7 @@
 #include "llvm/IR/CFG.h"
 #include "../ModuleState.h"
 #include "../VisitorCallback.h"
+#include "../AliasAnalysisVisitor.h"
 
 using namespace llvm;
 
@@ -74,6 +75,10 @@ namespace DRCHECKER {
 
         // TODO: Add doc comment here
         static void printPointsToSummary(GlobalState &targetState, llvm::raw_ostream& O);
+
+        // TODO: Add doc comment here
+        static void printAliasAnalysisSummary(AliasAnalysisVisitor* aliasVisitor, llvm::raw_ostream& O);
+
     };
 }
 

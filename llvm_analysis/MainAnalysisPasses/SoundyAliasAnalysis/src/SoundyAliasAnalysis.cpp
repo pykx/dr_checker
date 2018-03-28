@@ -11,6 +11,8 @@
 #include "ModuleState.h"
 #include <AliasObject.h>
 #include <iostream>
+#include <iomanip>  
+#include <time.h>
 #include <llvm/Analysis/CallGraph.h>
 #include <FunctionChecker.h>
 #include <CFGUtils.h>
@@ -28,7 +30,6 @@
 #include "llvm/Support/CommandLine.h"
 #include "bug_detectors/BugDetectorDriver.h"
 #include "PointsToUtils.h"
-
 
 using namespace llvm;
 
@@ -52,6 +53,7 @@ namespace DRCHECKER {
     FunctionHandlerCallback* AliasAnalysisVisitor::callback = new AliasFuncHandlerCallback();
     FunctionHandler* AliasAnalysisVisitor::functionHandler = new FunctionHandler(new KernelFunctionChecker());
     FunctionChecker* TaintAnalysisVisitor::functionChecker = nullptr;
+    AliasAnalysisVisitor* aliasVisitor;
 
     static cl::opt<std::string> checkFunctionName("toCheckFunction",
                                               cl::desc("Function which is to be considered as entry point "
@@ -148,6 +150,7 @@ namespace DRCHECKER {
 
         bool runOnModule(Module &m) override {
 
+            double time_elapsed;
             std::vector<Instruction *> callSites;
             FunctionChecker* targetChecker = new KernelFunctionChecker();
             // create data layout for the current module
@@ -162,6 +165,9 @@ namespace DRCHECKER {
             // setting function checker(s).
             TaintAnalysisVisitor::functionChecker = targetChecker;
             AliasAnalysisVisitor::callback->targetChecker = targetChecker;
+
+            // Start timer
+            time_t start_time = time(0);
 
             // Setup aliases for global variables.
             setupGlobals(m);
@@ -250,6 +256,10 @@ namespace DRCHECKER {
                         //SAAVisitor *vis = new SAAVisitor(currState, &currFunction, &callSites, traversalOrder);
                         dbgs() << "Starting Analyzing function:" << currFunction.getName() << "\n";
                         vis->analyze();
+
+                        // Stop timer
+                        time_elapsed = difftime(time(0), start_time);
+
                         if(outputFile == "") {
                             // No file provided, write to dbgs()
                             dbgs() << "[+] Writing JSON output :\n";
@@ -292,9 +302,16 @@ namespace DRCHECKER {
                                 statsFile.append(".stats.json");
                             }
 
-                            dbgs() << "[+] Writing Instr output to:" << statsFile << "\n";
+                            dbgs() << "[+] Writing Stats output to:" << statsFile << "\n";
                             llvm::raw_fd_ostream stats_op_stream(statsFile, res_code, llvm::sys::fs::F_Text);
+                            // TODO: how to set percision for llvm stream?
+                            //stats_op_stream << std::setprecision(5) << std::fixed;
+                            stats_op_stream << "{";
+                            stats_op_stream << "\"runtime_in_secs\":"  << (unsigned)time_elapsed << ",";
                             BugDetectorDriver::printPointsToSummary(currState, stats_op_stream);
+                            stats_op_stream << ",";
+                            BugDetectorDriver::printAliasAnalysisSummary(aliasVisitor, stats_op_stream);
+                            stats_op_stream << "}";
                             stats_op_stream.close();
 
                             dbgs() << "[+] Return message from file write:" << res_code.message() << "\n";
@@ -322,8 +339,8 @@ namespace DRCHECKER {
             // This function adds all analysis that need to be run by the global visitor.
             // it adds analysis in the correct order, i.e the order in which they need to be
             // run.
-
             VisitorCallback *currVisCallback = new AliasAnalysisVisitor(targetState, toAnalyze, srcCallSites);
+            aliasVisitor = (AliasAnalysisVisitor *)currVisCallback;
 
             // first add AliasAnalysis, this is the main analysis needed by everyone.
             allCallbacks->insert(allCallbacks->end(), currVisCallback);

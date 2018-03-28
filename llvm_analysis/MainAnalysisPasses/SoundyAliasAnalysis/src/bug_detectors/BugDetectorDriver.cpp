@@ -204,7 +204,7 @@ namespace DRCHECKER {
     void BugDetectorDriver::printPointsToSummary(GlobalState &targetState, llvm::raw_ostream& O) {
 
         /***
-         * Print summary of alias analysis results into provided stream.
+         * Print summary of points to information into provided stream.
          */
         unsigned totalSrcPtrs = 0;
         unsigned totalDstPtrs = 0;
@@ -219,9 +219,33 @@ namespace DRCHECKER {
             }
         }
 
-        O << "{\"points_to_summary\":["
+        O << "\"points_to_summary\":["
         << "{\"src_ptrs\":" << totalSrcPtrs << "}, "
-        << "{\"dst_ptrs\":" << totalDstPtrs << "}]}\n";
+        << "{\"dst_ptrs\":" << totalDstPtrs << "}]\n";
+
+    }
+
+    void BugDetectorDriver::printAliasAnalysisSummary(AliasAnalysisVisitor *aliasVisitor, llvm::raw_ostream& O) {
+
+        /***
+         * Print summary of alias analysis information into provided stream.
+         */
+        unsigned totalSrcPtrs = 0;
+        unsigned totalDstPtrs = 0;
+
+        std::map<Value *, std::set<PointerPointsTo*>*>* targetPointsToMap = 
+            aliasVisitor->currState.getPointsToInfo(aliasVisitor->currFuncCallSites);
+
+        for(auto ai:*targetPointsToMap) {
+            totalSrcPtrs++;
+            for(auto pp:*(ai.second)) {
+                totalDstPtrs++;
+            }
+        }
+
+        O << "\"alias_analysis_summary\":["
+        << "{\"src_ptrs\":" << totalSrcPtrs << "}, "
+        << "{\"dst_ptrs\":" << totalDstPtrs << "}]\n";
 
     }
 }
