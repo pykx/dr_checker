@@ -91,12 +91,14 @@ namespace DRCHECKER {
 
         static std::map<Function *, std::set<BasicBlock*>*> loopExitBlocks;
 
-
         // Data layout for the current module
         DataLayout *targetDataLayout;
 
         // Information needed for TaintAnalysis
         std::map<AnalysisContext*, std::map<Value *, std::set<TaintFlag*>*>*> taintInformation;
+
+        // For interprocedural statistics
+        unsigned max_callchain_depth_reached_count = 0;
 
         GlobalState(RangeAnalysis *ra, DataLayout *currDataLayout) {
             this->range_analysis = ra;

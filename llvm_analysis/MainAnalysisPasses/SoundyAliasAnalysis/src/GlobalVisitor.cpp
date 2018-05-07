@@ -102,6 +102,7 @@ namespace DRCHECKER {
 #ifdef DONOT_CARE_COMPLETION
         if(this->currFuncCallSites->size() > MAX_CALLSITE_DEPTH) {
             errs() << "MAX CALL SITE DEPTH REACHED, IGNORING:" << currFuncName << "\n";
+            this->currState.max_callchain_depth_reached_count++;
             return;
         }
 #endif

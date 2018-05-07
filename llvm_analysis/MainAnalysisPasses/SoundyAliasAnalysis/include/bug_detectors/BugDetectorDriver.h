@@ -77,6 +77,9 @@ namespace DRCHECKER {
         static void printPointsToSummary(GlobalState &targetState, llvm::raw_ostream& O);
 
         // TODO: Add doc comment here
+        static void printInterproceduralSummary(GlobalState &targetState, llvm::raw_ostream& O);
+
+        // TODO: Add doc comment here
         static void printAliasAnalysisSummary(AliasAnalysisVisitor* aliasVisitor, llvm::raw_ostream& O);
 
     };

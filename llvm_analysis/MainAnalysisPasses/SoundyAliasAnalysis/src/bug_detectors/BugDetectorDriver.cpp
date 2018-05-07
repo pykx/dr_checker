@@ -225,6 +225,27 @@ namespace DRCHECKER {
 
     }
 
+    void BugDetectorDriver::printInterproceduralSummary(GlobalState &targetState, llvm::raw_ostream& O) {
+
+        /***
+         * Print summary of context and callchain information into provided stream.
+         */
+        unsigned totalContexts = 0;
+        unsigned totalWarnings = 0;
+
+        for (auto warn_iter = targetState.allVulnWarnings.begin(); warn_iter != targetState.allVulnWarnings.end(); warn_iter++) {
+            totalContexts++;
+            std::set<VulnerabilityWarning *> *allWarnings = warn_iter->second;
+            totalWarnings += allWarnings->size();
+        }
+
+        O << "\"interprocedural_summary\":["
+        << "{\"total_contexts\":" << totalContexts << "}, "
+        << "{\"total_warnings\":" << totalWarnings << "}, "
+        << "{\"max_depth_hits\":" << targetState.max_callchain_depth_reached_count << "}]\n";
+
+    }
+
     void BugDetectorDriver::printAliasAnalysisSummary(AliasAnalysisVisitor *aliasVisitor, llvm::raw_ostream& O) {
 
         /***

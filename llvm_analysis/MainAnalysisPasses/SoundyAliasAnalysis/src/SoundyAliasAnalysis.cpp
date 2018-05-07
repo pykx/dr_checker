@@ -311,6 +311,8 @@ namespace DRCHECKER {
                             BugDetectorDriver::printPointsToSummary(currState, stats_op_stream);
                             stats_op_stream << ",";
                             BugDetectorDriver::printAliasAnalysisSummary(aliasVisitor, stats_op_stream);
+                            stats_op_stream << ",";
+                            BugDetectorDriver::printInterproceduralSummary(currState, stats_op_stream);
                             stats_op_stream << "}";
                             stats_op_stream.close();
 
