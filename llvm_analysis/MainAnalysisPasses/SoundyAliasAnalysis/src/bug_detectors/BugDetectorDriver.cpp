@@ -230,17 +230,19 @@ namespace DRCHECKER {
         /***
          * Print summary of context and callchain information into provided stream.
          */
-        unsigned totalContexts = 0;
+        unsigned totalContexts = targetState.availableAnalysisContexts.size();
+        unsigned totalContextsWithWarnings = 0;
         unsigned totalWarnings = 0;
 
         for (auto warn_iter = targetState.allVulnWarnings.begin(); warn_iter != targetState.allVulnWarnings.end(); warn_iter++) {
-            totalContexts++;
+            totalContextsWithWarnings++;
             std::set<VulnerabilityWarning *> *allWarnings = warn_iter->second;
             totalWarnings += allWarnings->size();
         }
 
         O << "\"interprocedural_summary\":["
         << "{\"total_contexts\":" << totalContexts << "}, "
+        << "{\"total_contexts_with_warnings\":" << totalContextsWithWarnings << "}, "
         << "{\"total_warnings\":" << totalWarnings << "}, "
         << "{\"max_depth_hits\":" << targetState.max_callchain_depth_reached_count << "}]\n";
 
