@@ -71,7 +71,8 @@ class LLVMBuild(Component):
 INVALID_GCC_FLAGS = ['-mno-thumb-interwork', '-fconserve-stack', '-fno-var-tracking-assignments',
                      '-fno-delete-null-pointer-checks', '--param=allow-store-data-races=0',
                      '-Wno-unused-but-set-variable', '-Werror=frame-larger-than=1', '-Werror', '-Wall',
-                     '-fno-jump-tables', '-nostdinc', '-fno-ipa-sra']
+                     '-fno-jump-tables', '-nostdinc', '-fno-ipa-sra', 'aarch64-linux-android-gcc', 
+                     '-O1', '-O2', '-O3', '-Os', '-Ofast']
 # target optimization to be used for llvm
 TARGET_OPTIMIZATION_FLAGS = ['-O0']
 # debug flags to be used by llvm
@@ -130,8 +131,8 @@ def _is_allowed_flag(curr_flag):
     :return: True/False
     """
     # if this is a optimization flag, remove it.
-    if str(curr_flag)[:2] == "-O":
-        return False
+    #if str(curr_flag)[:2] == "-O":
+    #    return False
 
     # if the flag is invalid
     for curr_in_flag in INVALID_GCC_FLAGS:
@@ -152,7 +153,7 @@ def _get_llvm_build_str(src_root_dir, gcc_build_string, output_folder, target_ar
     :return: LLVM build string
     """
 
-    orig_build_args = gcc_build_string.strip().split()[1:]
+    orig_build_args = ['-ferror-limit=1000'] + gcc_build_string.strip().split()[1:]
     rel_src_file_name = _get_src_file(orig_build_args)
 
     if build_output_dir is None:
